@@ -14,6 +14,12 @@ class MultiDict(MutableMapping):
         '''
         return key
 
+    def _to_external_key(self, key):
+        '''
+        Transforms a `self.value_store` key into an externally presentable key.
+        '''
+        return key
+
     # MutableMapping protocol definitions
     def __getitem__(self, key):
         value_store_key = self._to_cannonical_key(key)
@@ -26,10 +32,11 @@ class MultiDict(MutableMapping):
         self.value_store[value_store_key] = value
 
     def __delitem__(self, key):
-        raise NotImplementedError(f"TODO(sshirokov) delete {key}")
+        value_store_key = self._to_cannonical_key(key)
+        del self.value_store[key]
 
     def __iter__(self):
-        raise NotImplementedError(f"TODO(sshirokov) return generator of all keys")
+        return (self._to_external_key(k) for k in self.value_store.keys())
 
     def __len__(self):
-        raise NotImplementedError(f"TODO(sshirokov) return number of keys")
+        return len(self.value_store)
