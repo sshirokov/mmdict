@@ -1,0 +1,2 @@
+class MultiDict(dict):
+    pass
