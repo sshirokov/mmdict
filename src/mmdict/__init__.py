@@ -1,18 +1,33 @@
 from collections.abc import MutableMapping
+from typing import get_args
+from typing import Any, List, Sequence, Tuple, Union
 
 class MultiDict(MutableMapping):
-    def __init__(self, initial={}):
-        self.value_store = dict()
+    def __init__(self, initial={}, aliases={}):
+        # Actual storage of values, by cannonical key
+        self.value_store = {}
+        # Mapping of alias -> cannonical key
+        self.alias_to_storage = {}
 
-        for k,v in initial.items():
-            self[k] = v
+        for real, alias in aliases.items():
+            if not isinstance(alias, List):
+                alias = [alias]
+            self.alias(real, alias)
+
+        for k, v in initial.items():
+            storage_key = self._to_cannonical_key(k)
+            self[storage_key] = v
+
+    def alias(self, canonical: Any, aliases: List[Any]):
+        for alias in aliases:
+            self.alias_to_storage[alias] = canonical
 
     def _to_cannonical_key(self, key):
         '''
         Transform a supplied key into the key used to store values in
         `self.value_store` by resolving aliases.
         '''
-        return key
+        return self.alias_to_storage.get(key, key)
 
     def _to_external_key(self, key):
         '''
