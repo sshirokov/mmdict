@@ -33,3 +33,9 @@ python -m ensurepip --upgrade
 python -m pip install --upgrade pip
 pip install -e .
 ```
+
+## Running tests
+
+```bash
+python -m unittest discover -s tests
+```
