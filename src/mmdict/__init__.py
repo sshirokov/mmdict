@@ -2,6 +2,8 @@ from collections.abc import MutableMapping
 from typing import get_args
 from typing import Any, List, Sequence, Tuple, Union
 
+class AliasExistsError(KeyError): pass
+
 class MultiDict(MutableMapping):
     def __init__(self, initial={}, aliases={}):
         # Actual storage of values, by cannonical key
@@ -19,7 +21,19 @@ class MultiDict(MutableMapping):
             self[storage_key] = v
 
     def alias(self, canonical: Any, aliases: List[Any]):
+        not_found = KeyError("Not Found")
         for alias in aliases:
+            # We are not alowed to overwrite an alias with an alias to a different key.
+            #
+            # This prevents an initialization such as as
+            #   `MultiDict(..., aliases={"one": ["One", 1], "two": ["One", "Two"]})`
+            # from silently replacing, or abitrarily chosing to keep, one definition of
+            #   `"One" -> "one"` or `"One" -> "two"`
+            #
+            # We use a sentinel `not_found` to avoid failing on falsey but valid keys.
+            existing = self.alias_to_storage.get(alias, not_found)
+            if existing not in (canonical, not_found):
+                raise AliasExistsError(f'{alias} is already defined as an alias for {canonical}')
             self.alias_to_storage[alias] = canonical
 
     def _to_cannonical_key(self, key):
@@ -38,9 +52,12 @@ class MultiDict(MutableMapping):
     # MutableMapping protocol definitions
     def __getitem__(self, key):
         value_store_key = self._to_cannonical_key(key)
-        # TODO(sshirokov): Improve the failure error to not just reply with the `value_store_key` - but the passed in key
-        #                  and possibly a list of aliases it can be known by
-        return self.value_store[value_store_key]
+        try:
+            return self.value_store[value_store_key]
+        except KeyError:
+            # Re-raise the `KeyError` with the passed in key instead
+            # of the transformed, canonical storage one.
+            raise KeyError(key)
 
     def __setitem__(self, key, value):
         value_store_key = self._to_cannonical_key(key)
