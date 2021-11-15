@@ -67,7 +67,7 @@ class MultiDictAliasTests(unittest.TestCase):
         bad_key_name = "bad-key-name"
         d = mmdict.MultiDict(
             {"test": "ok"},
-            {bad_key_name: "does-not-exist"}
+            {"does-not-exist": bad_key_name}
         )
 
         self.assertEqual(d["test"], "ok")
