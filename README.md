@@ -6,13 +6,12 @@ A dictionary that allows you to alias keys to a canonical key. Also a case-insen
 
 Not if this section exists, but also here's a plan
 
-  * [ ] `mmdict.MultiDict`
-    * [ ] Set aliases on construction
-    * [ ] Set aliases after creation
-    * [ ] Getting by alias works
-    * [ ] Iteration keeps "canonical" key
-  * [ ] `mmdict.CaselessMultiDict`
-  * [ ] Tests of any kind
+  * [ ] `unalias` support
+  * [ ] `realias` support
+  * [ ] Helper to return a regular dict with canonical keys
+  * [ ] `__str__` pretty printer
+  * [ ] Helper to return aliases
+  * [ ] `mmdict.CaselessMultiDict` - which ignores case on read and write, but preserves it on output
 
 ## Development Setups
 
