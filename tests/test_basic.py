@@ -46,3 +46,5 @@ class MultiDictBasicTests(unittest.TestCase):
             del d["not present"]
 
 
+if __name__ == '__main__':
+    unittest.main()
