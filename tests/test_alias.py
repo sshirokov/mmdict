@@ -64,8 +64,11 @@ class MultiDictAliasTests(unittest.TestCase):
             d = mmdict.MultiDict({}, aliases=bad_aliases)
 
     def test__KeyError_for_alias_includes_requested_key(self):
-        d = mmdict.MultiDict({"test": "ok"})
         bad_key_name = "bad-key-name"
+        d = mmdict.MultiDict(
+            {"test": "ok"},
+            {bad_key_name: "does-not-exist"}
+        )
 
         self.assertEqual(d["test"], "ok")
         with self.assertRaisesRegex(KeyError, bad_key_name):
