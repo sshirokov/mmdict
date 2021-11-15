@@ -1,6 +1,5 @@
 from collections.abc import MutableMapping
-from typing import get_args
-from typing import Any, List, Sequence, Tuple, Union
+from typing import List, Hashable
 
 class AliasExistsError(KeyError): pass
 
@@ -20,7 +19,7 @@ class MultiDict(MutableMapping):
             storage_key = self._to_cannonical_key(k)
             self[storage_key] = v
 
-    def alias(self, canonical: Any, aliases: List[Any]):
+    def alias(self, canonical: Hashable, aliases: List[Hashable]):
         not_found = KeyError("Not Found")
         for alias in aliases:
             # We are not alowed to overwrite an alias with an alias to a different key.
