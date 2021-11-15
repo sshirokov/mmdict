@@ -74,6 +74,20 @@ class MultiDictAliasTests(unittest.TestCase):
         with self.assertRaisesRegex(KeyError, bad_key_name):
             d[bad_key_name]
 
+    def test__can_unalias_existing_aliases(self):
+        data = {"test": "ok"}
+        aliases = {"test": ["check", "evaluate"]}
+        d = mmdict.MultiDict(data, aliases)
+
+        self.assertEqual(d["test"], d["check"])
+        self.assertEqual(d["evaluate"], d["check"])
+
+        self.assertTrue(d.unalias("evaluate"))
+        self.assertIsNone(d.get("evaluate"))
+        self.assertFalse("evaluate" in d)
+        self.assertFalse(d.unalias("evaluate"))
+
+
 
 if __name__ == '__main__':
     unittest.main()

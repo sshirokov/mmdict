@@ -35,6 +35,16 @@ class MultiDict(MutableMapping):
                 raise AliasExistsError(f'{alias} is already defined as an alias for {canonical}')
             self.alias_to_storage[alias] = canonical
 
+    def unalias(self, alias: Hashable) -> bool:
+        '''
+        Remove an alias to a canonical key. Returns `True` if the alias was removed
+        `False` if no action was taken.
+        '''
+        if alias not in self.alias_to_storage:
+            return False
+        del self.alias_to_storage[alias]
+        return True
+
     def _to_cannonical_key(self, key):
         '''
         Transform a supplied key into the key used to store values in
