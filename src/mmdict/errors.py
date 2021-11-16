@@ -1,0 +1,1 @@
+class AliasExistsError(KeyError): pass
