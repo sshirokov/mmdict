@@ -106,7 +106,5 @@ class MultiDictAliasTests(unittest.TestCase):
         self.assertEqual(d['as well'], "ok")
 
 
-
-
 if __name__ == '__main__':
     unittest.main()
