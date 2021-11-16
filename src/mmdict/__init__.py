@@ -107,7 +107,7 @@ class MultiDict(MutableMapping):
 
     def __delitem__(self, key):
         value_store_key = self._to_cannonical_key(key)
-        del self.value_store[key]
+        del self.value_store[value_store_key]
 
     def __iter__(self):
         return (self._to_external_key(k) for k in self.value_store.keys())

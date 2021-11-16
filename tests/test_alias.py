@@ -3,6 +3,16 @@ import unittest
 import mmdict
 
 class MultiDictAliasTests(unittest.TestCase):
+    def test__can_delete_value_through_alias(self):
+        data = {"test": "ok"}
+        aliases = {"test": ["also", "as well"]}
+        d = mmdict.MultiDict(data, aliases)
+
+        del d["also"]
+        self.assertIsNone(d.get("test"))
+        self.assertFalse("test" in d)
+        self.assertFalse("also" in d)
+
     def test__declare_and_read_through_single_alias(self):
         data = {"test": "ok"}
         d = mmdict.MultiDict(data)
