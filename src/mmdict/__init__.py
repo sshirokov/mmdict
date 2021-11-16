@@ -9,6 +9,8 @@ class MultiDict(MutableMapping):
         self.value_store = {}
         # Mapping of alias -> cannonical key
         self.alias_to_storage = {}
+        # Mapping of {cannonical key -> Set[alias: Hashable]}
+        self.storage_to_aliases = {}
 
         # Load any constructor supplied aliases to prepare for
         # any constructor-supplied data
@@ -24,6 +26,9 @@ class MultiDict(MutableMapping):
     def alias(self, canonical: Hashable, aliases: List[Hashable]):
         not_found = KeyError("Not Found")
         for alias in aliases:
+            # Don't bother aliasing identity
+            if canonical == alias:
+                continue
             # We are not alowed to overwrite an alias with an alias to a different key.
             #
             # This prevents an initialization such as as
@@ -35,17 +40,37 @@ class MultiDict(MutableMapping):
             existing = self.alias_to_storage.get(alias, not_found)
             if existing not in (canonical, not_found):
                 raise AliasExistsError(f'{alias} is already defined as an alias for {canonical}')
+
+            # Store forward and backward refferences for the alias
             self.alias_to_storage[alias] = canonical
+            aliases_for_cannonical = self.storage_to_aliases.setdefault(canonical, set())
+            aliases_for_cannonical.add(alias)
 
     def unalias(self, alias: Hashable) -> bool:
         '''
-        Remove an alias to a canonical key. Returns `True` if the alias was removed
-        `False` if no action was taken.
+        Remove an alias to a canonical key.
+
+        Returns `True` if the alias was removed `False` if no action was taken.
         '''
-        if alias not in self.alias_to_storage:
+        not_found = KeyError("not found")
+        storage_key = self.alias_to_storage.get(alias, not_found)
+        if storage_key == not_found:
             return False
+
         del self.alias_to_storage[alias]
+        self.storage_to_aliases[storage_key].remove(alias)
         return True
+
+    def unalias_all(self, key: Hashable):
+        '''
+        Remove any aliases associated with `key`, first by following
+        the aliases to the cannoncal key, then clearing all aliases for
+        that cannonical key.
+        '''
+        storage_key = self._to_cannonical_key(key)
+        aliases = self.storage_to_aliases.get(storage_key, set())
+        for alias in aliases.copy():
+            self.unalias(alias)
 
     def _to_cannonical_key(self, key):
         '''

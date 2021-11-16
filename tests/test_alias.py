@@ -105,6 +105,34 @@ class MultiDictAliasTests(unittest.TestCase):
         self.assertEqual(d["also"], "ok")
         self.assertEqual(d['as well'], "ok")
 
+    def test__clear_alias_for_canonical_key(self):
+        pass_aliases = ["yes", "succeed", "hooray"]
+        aliases = {
+            "test": ["also", "as well", "furthermore"],
+            "pass": pass_aliases,
+        }
+        data = {
+            "pass": "ok",
+            "test": "also ok"
+        }
+        d = mmdict.MultiDict(data, aliases=aliases)
+
+        # We can read it before we clear
+        self.assertEqual(d["yes"], "ok")
+
+        # Then make sure we cannot read any of the aliases after we clear
+        d.unalias_all("pass")
+        for alias in pass_aliases:
+            self.assertFalse(alias in d)
+            self.assertIsNone(d.get(alias))
+            with self.assertRaises(KeyError):
+                d[alias]
+
+        # But can read the canonical key
+        self.assertEqual(d["pass"], "ok")
+        # And it doesn't break other aliases
+        self.assertEqual(d["furthermore"], d["test"])
+
 
 if __name__ == '__main__':
     unittest.main()
