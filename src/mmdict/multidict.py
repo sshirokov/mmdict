@@ -78,6 +78,9 @@ class MultiDict(MutableMapping):
         for alias in aliases.copy():
             self.unalias(alias)
 
+    def is_alias(self, key: Hashable) -> bool:
+        return self._to_internal_alias(key) in self.alias_to_storage
+
     def _to_internal_alias(self, key):
         '''
         Transforms a supplied alias to an internal alias.
@@ -92,7 +95,8 @@ class MultiDict(MutableMapping):
         Transform a supplied key into the key used to store values in
         `self.value_store` by resolving aliases.
         '''
-        return self.alias_to_storage.get(key, key)
+        internal_alias = self._to_internal_alias(key)
+        return self.alias_to_storage.get(internal_alias, key)
 
     def _to_external_key(self, key):
         '''
