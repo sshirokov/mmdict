@@ -6,7 +6,6 @@ A dictionary that allows you to alias keys to a canonical key. Also a case-insen
 
 Not if this section exists, but also here's a plan
 
-  * [ ] `realias` support
   * [ ] Helper to return a regular dict with canonical keys
   * [ ] `__str__` pretty printer
   * [ ] Helper to return aliases
