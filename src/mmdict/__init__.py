@@ -24,7 +24,10 @@ class MultiDict(MutableMapping):
         self.update(initial)
 
     def alias(self, canonical: Hashable, aliases: List[Hashable]):
+        # Ensure that any potential subclass transforms take place
+        canonical = self._to_storage_key(canonical)
         not_found = KeyError("Not Found")
+
         for alias in aliases:
             # Don't bother aliasing identity
             if canonical == alias:
@@ -39,7 +42,7 @@ class MultiDict(MutableMapping):
             # We use a sentinel `not_found` to avoid failing on falsey but valid keys.
             existing = self.alias_to_storage.get(alias, not_found)
             if existing not in (canonical, not_found):
-                raise AliasExistsError(f'{alias} is already defined as an alias for {canonical}')
+                raise AliasExistsError(f'{alias} is already defined as an alias for {existing}')
 
             # Store forward and backward refferences for the alias
             self.alias_to_storage[alias] = canonical
@@ -67,12 +70,12 @@ class MultiDict(MutableMapping):
         the aliases to the cannoncal key, then clearing all aliases for
         that cannonical key.
         '''
-        storage_key = self._to_cannonical_key(key)
+        storage_key = self._to_storage_key(key)
         aliases = self.storage_to_aliases.get(storage_key, set())
         for alias in aliases.copy():
             self.unalias(alias)
 
-    def _to_cannonical_key(self, key):
+    def _to_storage_key(self, key):
         '''
         Transform a supplied key into the key used to store values in
         `self.value_store` by resolving aliases.
@@ -93,7 +96,7 @@ class MultiDict(MutableMapping):
 
     # MutableMapping protocol definitions
     def __getitem__(self, key):
-        value_store_key = self._to_cannonical_key(key)
+        value_store_key = self._to_storage_key(key)
         try:
             return self.value_store[value_store_key]
         except KeyError:
@@ -102,11 +105,11 @@ class MultiDict(MutableMapping):
             raise KeyError(key)
 
     def __setitem__(self, key, value):
-        value_store_key = self._to_cannonical_key(key)
+        value_store_key = self._to_storage_key(key)
         self.value_store[value_store_key] = value
 
     def __delitem__(self, key):
-        value_store_key = self._to_cannonical_key(key)
+        value_store_key = self._to_storage_key(key)
         del self.value_store[value_store_key]
 
     def __iter__(self):
