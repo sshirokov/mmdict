@@ -29,8 +29,9 @@ class MultiDict(MutableMapping):
         not_found = KeyError("Not Found")
 
         for alias in aliases:
+            alias_key = self._to_internal_alias(alias)
             # Don't bother aliasing identity
-            if canonical == alias:
+            if canonical == alias_key:
                 continue
             # We are not alowed to overwrite an alias with an alias to a different key.
             #
@@ -40,14 +41,15 @@ class MultiDict(MutableMapping):
             #   `"One" -> "one"` or `"One" -> "two"`
             #
             # We use a sentinel `not_found` to avoid failing on falsey but valid keys.
-            existing = self.alias_to_storage.get(alias, not_found)
+            existing = self.alias_to_storage.get(alias_key, not_found)
             if existing not in (canonical, not_found):
-                raise AliasExistsError(f'{alias} is already defined as an alias for {existing}')
+                existing_external = self._to_external_key(existing)
+                raise AliasExistsError(f'{alias} is already defined as an alias for {existing_external}')
 
             # Store forward and backward refferences for the alias
-            self.alias_to_storage[alias] = canonical
+            self.alias_to_storage[alias_key] = canonical
             aliases_for_cannonical = self.storage_to_aliases.setdefault(canonical, set())
-            aliases_for_cannonical.add(alias)
+            aliases_for_cannonical.add(alias_key)
 
     def unalias(self, alias: Hashable) -> bool:
         '''
@@ -56,12 +58,13 @@ class MultiDict(MutableMapping):
         Returns `True` if the alias was removed `False` if no action was taken.
         '''
         not_found = KeyError("not found")
-        storage_key = self.alias_to_storage.get(alias, not_found)
+        alias_key = self._to_internal_alias(alias)
+        storage_key = self.alias_to_storage.get(alias_key, not_found)
         if storage_key == not_found:
             return False
 
-        del self.alias_to_storage[alias]
-        self.storage_to_aliases[storage_key].remove(alias)
+        del self.alias_to_storage[alias_key]
+        self.storage_to_aliases[storage_key].remove(alias_key)
         return True
 
     def unalias_all(self, key: Hashable):
@@ -74,6 +77,15 @@ class MultiDict(MutableMapping):
         aliases = self.storage_to_aliases.get(storage_key, set())
         for alias in aliases.copy():
             self.unalias(alias)
+
+    def _to_internal_alias(self, key):
+        '''
+        Transforms a supplied alias to an internal alias.
+
+        Not used in the base, but allows for easier normalization
+        of aliases.
+        '''
+        return key
 
     def _to_storage_key(self, key):
         '''
