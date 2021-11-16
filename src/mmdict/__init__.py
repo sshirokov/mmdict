@@ -82,6 +82,12 @@ class MultiDict(MutableMapping):
     def _to_external_key(self, key):
         '''
         Transforms a `self.value_store` key into an externally presentable key.
+
+        Not actively used here, but tied into `__iter__`, so that subclasses can
+        differentiate between the storage key and the user supplied key that
+        produced it.
+
+        For example, using downcased storage keys, but preserving case for iteration.
         '''
         return key
 
