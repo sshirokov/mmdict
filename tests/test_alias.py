@@ -87,6 +87,25 @@ class MultiDictAliasTests(unittest.TestCase):
         self.assertFalse("evaluate" in d)
         self.assertFalse(d.unalias("evaluate"))
 
+    def test__constructor_writes_follow_alias_definitions(self):
+        data = {"also": "ok"}
+        aliases = {"test": ["also", "as well", "furthermore"]}
+        d = mmdict.MultiDict(data, aliases=aliases)
+
+        self.assertEqual(d['test'], "ok")
+        self.assertEqual(d["also"], "ok")
+        self.assertEqual(d['as well'], "ok")
+
+    def test__writes_follow_alias_definitions(self):
+        aliases = {"test": ["also", "as well", "furthermore"]}
+        d = mmdict.MultiDict(aliases=aliases)
+
+        d["furthermore"] = "ok"
+        self.assertEqual(d['test'], "ok")
+        self.assertEqual(d["also"], "ok")
+        self.assertEqual(d['as well'], "ok")
+
+
 
 
 if __name__ == '__main__':

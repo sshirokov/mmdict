@@ -10,14 +10,16 @@ class MultiDict(MutableMapping):
         # Mapping of alias -> cannonical key
         self.alias_to_storage = {}
 
+        # Load any constructor supplied aliases to prepare for
+        # any constructor-supplied data
         for real, alias in aliases.items():
             if not isinstance(alias, List):
                 alias = [alias]
             self.alias(real, alias)
 
-        for k, v in initial.items():
-            storage_key = self._to_cannonical_key(k)
-            self[storage_key] = v
+        # Load any constructor-supplied data. We simply let the
+        # `MutableMapping` protocol take the wheel from here
+        self.update(initial)
 
     def alias(self, canonical: Hashable, aliases: List[Hashable]):
         not_found = KeyError("Not Found")
