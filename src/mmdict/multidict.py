@@ -144,3 +144,9 @@ class MultiDict(MutableMapping):
         Return a regular `dict` of the canonical keys and values
         '''
         return dict(self.items())
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        data = self.to_dict()
+        aliases = self.storage_to_aliases
+        return f'<{class_name}: {data} aliases={aliases}>'
