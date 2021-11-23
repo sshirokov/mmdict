@@ -137,3 +137,10 @@ class MultiDict(MutableMapping):
 
     def __len__(self):
         return len(self.value_store)
+
+    # Pretty-printers and exports
+    def to_dict(self) -> dict:
+        '''
+        Return a regular `dict` of the canonical keys and values
+        '''
+        return dict(self.items())

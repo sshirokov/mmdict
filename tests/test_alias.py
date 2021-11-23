@@ -151,6 +151,26 @@ class MultiDictAliasTests(unittest.TestCase):
         # And it doesn't break other aliases
         self.assertEqual(d["furthermore"], d["test"])
 
+    def test__can_return_regular_dict_with_canonical_keys(self):
+        expected = {
+            "first": "ok",
+            "second": "fine",
+            "third": "great",
+        }
+        d = mmdict.MultiDict(aliases={
+            "first": [1, "1st", "one"],
+            "second": [2, "2nd", "two"],
+            "third": "three"
+        })
+        d.update({
+            "third": "great",
+            "2nd": "fine",
+            1: "ok"
+        })
+
+        regular_d = d.to_dict()
+        self.assertDictEqual(expected, regular_d)
+
 
 if __name__ == '__main__':
     unittest.main()

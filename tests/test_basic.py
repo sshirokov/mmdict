@@ -45,6 +45,14 @@ class MultiDictBasicTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             del d["not present"]
 
+    def test__can_compare_to_regular_dict(self):
+        expected = {"ok": "fine", "great": "good"}
+        d = mmdict.MultiDict({"ok": "fine", "great": "good"})
+
+        self.assertTrue(d == expected)
+        # And a false one for sanity
+        self.assertFalse(d == {"not": "ok"})
+
 
 if __name__ == '__main__':
     unittest.main()
