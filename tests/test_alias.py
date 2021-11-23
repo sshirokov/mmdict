@@ -73,6 +73,14 @@ class MultiDictAliasTests(unittest.TestCase):
         with self.assertRaises(mmdict.AliasExistsError):
             d = mmdict.MultiDict({}, aliases=bad_aliases)
 
+    def test__alias_cannot_shadow_another_alias_destiation(self):
+        bad_aliases = {
+            "first": ["second"],
+            "second": ["first"],
+        }
+        with self.assertRaises(mmdict.AliasExistsError):
+            d = mmdict.MultiDict(aliases=bad_aliases)
+
     def test__KeyError_for_alias_includes_requested_key(self):
         bad_key_name = "bad-key-name"
         d = mmdict.MultiDict(

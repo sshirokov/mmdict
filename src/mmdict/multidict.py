@@ -24,6 +24,10 @@ class MultiDict(MutableMapping):
         self.update(initial)
 
     def alias(self, canonical: Hashable, aliases: List[Hashable]):
+        # We do not want to allow an alias to shadow a destination
+        if self.is_alias(canonical):
+            raise AliasExistsError(f'{canonical} is already defined as an alias destination.')
+
         # Ensure that any potential subclass transforms take place
         canonical = self._to_storage_key(canonical)
         not_found = KeyError("Not Found")
