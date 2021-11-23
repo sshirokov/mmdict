@@ -11,14 +11,13 @@ Not if this section exists, but also here's a plan
   * [ ] Helper to return aliases
   * [ ] `mmdict.CaselessMultiDict` - which ignores case on read and write, but preserves it on output
 
-## Development Setups
+## Development Setup
 
 *nix
 
 ```bash
 python -mvenv .venv
 . .venv/bin/activate
-pip install -e .
 ```
 
 PowerShell
@@ -26,6 +25,11 @@ PowerShell
 ```powershell
 python -mvenv .venv
 .\.venv\Scripts\Activate.ps1
+```
+
+Then, for both platforms
+
+```bash
 python -m ensurepip --upgrade
 python -m pip install --upgrade pip
 pip install -e .
@@ -33,6 +37,10 @@ pip install -e .
 
 ## Running tests
 
+With the virtual environment activated, use the multi-platform script to run the test suite.
+
 ```bash
-python -m unittest discover -s tests
+script/test.sh.ps1
 ```
+
+It's a very thin thin wrapper around bootstrapping the test run with python.
