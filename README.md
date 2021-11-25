@@ -1,10 +1,45 @@
+![imma do it](./images/dict-so-configurable.png)
+
 ## What is it
 
-A dictionary that allows you to alias keys to a canonical key. Also a case-insentive version, probably.
+A set of dictionary classes that allow an aliasing of keys to other keys consistently, and a follow up implementation that does the same thing without concern for the case of string keys while preserving case for output and iteration.
+
+Neither implementation assumes string keys, so anything `Hashable` should remain compatible for all keys in the API.
+
+It's still directly comparable (`==`, `in`, `.get()`, etc) and access compatible with `dict()`, and offers a mild framework for implementing key-transforming dictionaries somewhat painlessly with a decent test backing.
 
 ## Does it work?
 
-Yes
+Yes, check this out.
+
+```python
+from mmdict import MultiDict
+
+data = {"test": "ok"}
+alternatives = {"test": ["also", "as well"]}
+d = MultiDict(data, aliases=alternatives)
+
+# True
+d["also"] == "ok"
+
+# True
+d["as well"] == d["test"]
+```
+
+```python
+from mmdict import CaselessMultiDict
+
+d = CaselessMultiDict({"Test": "not ok"})
+
+# True
+d["Test"] = "ok"
+
+# True, because `Test` and `test` are caselessly the same
+d["test"] == "ok"
+
+# True, because, the case of the initial write is preserved for iteration
+list(d.keys()) == ["Test"]
+```
 
 ## Development Setup
 
