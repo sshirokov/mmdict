@@ -31,10 +31,10 @@ from mmdict import CaselessMultiDict
 
 d = CaselessMultiDict({"Test": "not ok"})
 
-# True
+# A super valid write, because we're a regular dict() right?
 d["Test"] = "ok"
 
-# True, because `Test` and `test` are caselessly the same
+# Oh wow, `True`, because `"Test"` and `"test"` are caselessly the same
 d["test"] == "ok"
 
 # True, because, the case of the initial write is preserved for iteration
