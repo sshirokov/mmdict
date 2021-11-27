@@ -1,3 +1,5 @@
+![CI Status](https://github.com/sshirokov/mmdict/actions/workflows/main.yml/badge.svg)
+
 ![imma do it](./images/dict-so-configurable.png)
 
 ## What is it
