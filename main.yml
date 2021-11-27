@@ -1,0 +1,17 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Unit Tests
+        run: |
+          python -m ensurepip --upgrade
+          python -m pip install --upgrade pip
+          pip install -e .
+          script/test.sh.ps1
